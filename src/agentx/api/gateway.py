@@ -4,11 +4,11 @@ dummy API class. Further implementation will
 
 """
 
-from models import AgentRequest, AgentResponse
+from .models import AgentRequest, AgentResponse
 
 def handle_request(request: AgentRequest) -> AgentResponse:
-    user_id = request.medatada.user_id
-    channel = request.medatada.channel
+    user_id = request.metadata.user_id
+    channel = request.metadata.channel
     message = request.message
 
     final_text = f"[stub] Użytkownik {user_id} napisał: {message}, na kanale {channel}"

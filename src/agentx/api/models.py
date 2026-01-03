@@ -20,7 +20,7 @@ class AgentRequest(BaseModel):
     metadata – informacje o użytkowniku.
     """
     message: str
-    medatada: UserMetadata
+    metadata: UserMetadata
 
 class AgentResponse(BaseModel):
     """
