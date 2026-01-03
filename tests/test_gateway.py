@@ -11,9 +11,18 @@ def test_handle_request_stub():
         metadata=metadata,
         message="Hello World!"
     )
+
     resp = handle_request(req)
+    print(resp.final_answer)
 
     assert "123abc" in resp.final_answer
     assert "Hello World!" in resp.final_answer
     assert resp.trace is not None
-    assert resp.trace.get("steps") == ["gateway_stub"]
+    steps = resp.trace.get("steps", [])
+
+    assert "orchestrator_start" in steps
+    assert "single_step_reply" in steps
+    assert "orchestrator_end" in steps
+
+    assert resp.extra is not None
+    assert resp.extra.get("version") == "0.0.2"

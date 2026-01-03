@@ -1,19 +1,12 @@
 """
 dummy API class. Further implementation will
 
-
 """
-
 from .models import AgentRequest, AgentResponse
+from ..core.orchestrator import Orchestrator
+
+_orchestrator = Orchestrator()
 
 def handle_request(request: AgentRequest) -> AgentResponse:
-    user_id = request.metadata.user_id
-    channel = request.metadata.channel
-    message = request.message
+    return _orchestrator.run(request)
 
-    final_text = f"[stub] Użytkownik {user_id} napisał: {message}, na kanale {channel}"
-
-    return AgentResponse(
-        final_answer=final_text,
-        trace={"steps": ["gateway_stub"]},
-        extra={"version": "0.0.1"})
