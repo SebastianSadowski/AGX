@@ -15,10 +15,14 @@ from agentx.api.models import AgentResponse
 from agentx.memory.context_builder import *
 from typing import Optional
 
+from agentx.memory.session_store import MessageRole
+
+
 class Orchestrator:
-    def __init__(self, context_builder: Optional[ContextBuilder] = None ):
+    def __init__(self, context_builder: Optional[ContextBuilder] = None, session_store: Optional[InMemorySessionStore] = None ):
         print('hello')
-        self.context_builder = context_builder or ContextBuilder()
+        self.session_store= session_store or InMemorySessionStore()
+        self.context_builder = context_builder or ContextBuilder(self.session_store)
 
 
     def run(self, request: AgentRequest) -> AgentResponse:
@@ -28,15 +32,24 @@ class Orchestrator:
         :param request: AgentRequest
         :return: AgentResponse
         """
+
+        #here - fetch context & append user message
         context: Context = self.context_builder.build(request)
 
-        user_id = context.get("user_id")
-        channel = context.get("channel")
+        user_id = request.metadata.user_id
+        channel = request.metadata.channel
         message = request.message
+        history = context.get('history', [])
 
+        self._update_session(user_id, message, 'user')
         # here - composes response message
+        history_len = len(history)
+        final_text = (
+            f"[orchestrator] Kanał={channel}, user={user_id}, "
+            f"wiadomości w historii: {history_len}. "
+            f"Ostatnia wiadomość: {message}"
+        )
 
-        final_text = f"[orchestrator] Kanał={channel}, user={user_id} napisał: {message}"
 
         # here - composes trace log
         trace = {
@@ -46,20 +59,27 @@ class Orchestrator:
                 "orchestrator_end"
             ],
             "context_summary":{
-                "has_history": bool(context.get("history")),
-                "language": context.get('language')
+                "history_length": history_len,
+                "language": context.get("language"),
             }
         }
 
         # here - composes extra dictionary
 
         extra = {
-            "version": "0.0.2",
-            "notes": "Najprostsza wersja Orchestratora (brak planera, narzędzi itd.)",
+            "version": "0.0.3",
+            "notes": "Orchestrator z contextem i historia konwersacji (brak planera, narzędzi itd.)",
         }
 
-        return AgentResponse(
+
+        response = AgentResponse(
             final_answer=final_text,
             trace=trace,
             extra=extra,
         )
+
+        self._update_session(user_id, response.final_answer, 'assistant')
+        return response
+
+    def _update_session(self, user_id: str, message: str, role=MessageRole) -> None:
+        self.session_store.append_message(user_id=user_id, message=message, role=role)
