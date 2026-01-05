@@ -3,7 +3,7 @@ from agentx.api.gateway import handle_request
 
 def test_handle_single_request():
     metadata = UserMetadata(
-        user_id="123abc",
+        user_id="123abc-test1",
         conversation_id="123-abc-123",
         permissions=None
     )
@@ -18,7 +18,7 @@ def test_handle_single_request():
 
 
     #assert general
-    assert "123abc" in resp.final_answer
+    assert "123abc-test1" in resp.final_answer
     assert "Hello World!" in resp.final_answer
 
     #assert trace
@@ -42,7 +42,7 @@ def test_handle_single_request():
 
 def test_handle_conversation_request():
     metadata = UserMetadata(
-        user_id="123abc",
+        user_id="123abc-test2",
         conversation_id="123-abc-123",
         permissions=None
     )
@@ -59,14 +59,14 @@ def test_handle_conversation_request():
     resp1 = handle_request(message1)
     print(resp1.final_answer)
     print(resp1.trace)
-    resp = handle_request(message1)
+    resp = handle_request(message2)
     print(resp.final_answer)
     print(resp.trace)
 
 
     #assert general
-    assert "123abc" in resp.final_answer
-    assert "Hello World!" in resp.final_answer
+    assert "123abc-test2" in resp.final_answer
+    assert "Message 2" in resp.final_answer
 
     #assert trace
     assert resp.trace is not None
