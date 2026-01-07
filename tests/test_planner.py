@@ -1,6 +1,6 @@
 from agentx.api.models import AgentRequest, AgentResponse, UserMetadata
 from agentx.core.types import Context, Plan, PlanStep
-from agentx.planning.base import Planning, STEP_TYPE_GENERATE_RESPONSE, STEP_TYPE_CALL_TOOL
+from agentx.planning.base import Planner, STEP_TYPE_GENERATE_RESPONSE, STEP_TYPE_CALL_TOOL
 from agentx.planning.simple_planner import SimplePlanner
 
 
@@ -15,7 +15,7 @@ def test_handle_math_request():
         message="Policz wynik równania 2*2"
     )
 
-    simple_planner: Planning = SimplePlanner()
+    simple_planner: Planner = SimplePlanner()
 
     plan: Plan = simple_planner.make_plan(request=req, context=Context)
 
@@ -34,7 +34,7 @@ def test_handle_regular_request():
         message="Hej, jak sie masz?"
     )
 
-    simple_planner: Planning = SimplePlanner()
+    simple_planner: Planner = SimplePlanner()
 
     plan: Plan = simple_planner.make_plan(request=req, context=Context)
 

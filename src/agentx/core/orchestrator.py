@@ -17,15 +17,15 @@ from agentx.memory.context_builder import *
 from typing import Optional
 
 from agentx.memory.session_store import MessageRole
-from agentx.planning.base import Planning, STEP_TYPE_GENERATE_RESPONSE, STEP_TYPE_CALL_TOOL
+from agentx.planning.base import Planner, STEP_TYPE_GENERATE_RESPONSE, STEP_TYPE_CALL_TOOL
 from agentx.planning.simple_planner import SimplePlanner
 
 
 class Orchestrator:
-    def __init__(self, context_builder: Optional[ContextBuilder] = None, session_store: Optional[InMemorySessionStore] = None, planner: Optional[Planning] = None):
+    def __init__(self, context_builder: Optional[ContextBuilder] = None, session_store: Optional[InMemorySessionStore] = None, planner: Optional[Planner] = None):
         self.session_store= session_store or InMemorySessionStore()
         self.context_builder = context_builder or ContextBuilder(self.session_store)
-        self.planner: Planning = planner or SimplePlanner()
+        self.planner: Planner = planner or SimplePlanner()
 
 
     def run(self, request: AgentRequest) -> AgentResponse:
@@ -71,7 +71,7 @@ class Orchestrator:
             "steps": [
                 "orchestrator_start",
                 "single_step_reply",
-                [f"{st.description} ({st.step_type})" for st in plan.steps],
+                *[f"{st.description} ({st.step_type})" for st in plan.steps],
                 "orchestrator_end"
             ],
             "context_summary":{
@@ -97,7 +97,7 @@ class Orchestrator:
         self._update_session(user_id, response.final_answer, 'assistant')
         return response
 
-    def _update_session(self, user_id: str, message: str, role=MessageRole) -> None:
+    def _update_session(self, user_id: str, message: str, role: MessageRole) -> None:
         self.session_store.append_message(user_id=user_id, message=message, role=role)
 
     def _handle_step(self, step: PlanStep):

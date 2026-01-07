@@ -4,10 +4,10 @@ from typing import List
 
 from agentx.api.models import AgentRequest
 from agentx.core.types import Context, Plan, PlanStep
-from agentx.planning.base import Planning, STEP_TYPE_CALL_TOOL, STEP_TYPE_GENERATE_RESPONSE
+from agentx.planning.base import Planner, STEP_TYPE_CALL_TOOL, STEP_TYPE_GENERATE_RESPONSE
 
 
-class SimplePlanner(Planning):
+class SimplePlanner(Planner):
     def make_plan(self, request: AgentRequest, context: Context) -> Plan:
         steps: List[PlanStep] = []
         plan: Plan = Plan(steps=steps)

@@ -6,5 +6,5 @@ from agentx.core.types import StepType
 STEP_TYPE_GENERATE_RESPONSE: StepType = 'GENERATE_RESPONSE'
 STEP_TYPE_CALL_TOOL: StepType = "CALL_TOOL"
 
-class Planning(Protocol):
+class Planner(Protocol):
     def make_plan(self,*, request: AgentRequest, context: Context) -> Plan: ...
